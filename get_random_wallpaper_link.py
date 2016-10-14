@@ -3,9 +3,15 @@
 import requests
 from bs4 import BeautifulSoup
 import os
+import sys
 import random
+import datetime
 
-FILE = 'file.jpg'
+file = datetime.datetime.now().strftime('%Y-%M-%dT%H%M%S')
+if len(sys.argv) >= 2:
+    dir = sys.argv[1]
+else:
+    dir = os.getcwd()
 
 def get_wallhaven_random():
      resp = requests.get("https://alpha.wallhaven.cc/search?categories=100&resolutions=1920x1080%2C1920x1200%2C2560x1440%2C2560x1600%2C3840x1080%2C5760x1080%2C3840x2160%2C5120x2880&sorting=random")
@@ -23,12 +29,18 @@ def set_windows_wallpaper(file):
      os.system('RUNDLL32.EXE user32.dll, UpdatePerUserSystemParameters')
 
 
-link = get_wallhaven_random()
-print (link)
-#r = requests.get(link, stream=True)
-#if r.status_code == 200:
-     #with open(FILE, 'wb') as f:
-         #for chunk in r:
-             #f.write(chunk)
+def set_ubuntu_wallpaper(file):
+    os.system("gsettings set org.gnome.desktop.background picture-uri file://" + file)
 
-#set_windows_wallpaper(os.path.join(os.getcwd(), FILE))
+
+link = get_wallhaven_random()
+
+path = os.path.join(dir, file)
+
+r = requests.get(link, stream=True)
+if r.status_code == 200:
+     with open(path, 'wb') as f:
+         for chunk in r:
+             f.write(chunk)
+
+set_ubuntu_wallpaper(path)
